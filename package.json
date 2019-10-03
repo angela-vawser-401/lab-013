@@ -1,0 +1,58 @@
+{
+  "name": "fsjs-e2e-route-model-quiz",
+  "version": "1.0.0",
+  "description": "FSJS: E2E Testing of Routes and Models ===",
+  "main": "server.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "jest": "jest --runInBand --verbose",
+    "test": "npm run jest",
+    "test:coverage": "npm run test -- --coverage",
+    "test:watch": "npm run jest -- --watchAll",
+    "test:verbose": "npm run test -- --verbose",
+    "start": "node server.js",
+    "start:watch": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.1.0",
+    "express": "^4.17.1",
+    "js": "^0.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.7.1",
+    "morgan": "^1.9.1"
+  },
+  "devDependencies": {
+    "@shelf/jest-mongodb": "^1.1.1",
+    "eslint": "^6.4.0",
+    "jest": "^24.9.0",
+    "nodemon": "^1.19.3",
+    "prettier": "^1.18.2",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "preset": "@shelf/jest-mongodb",
+    "setupFilesAfterEnv": [
+      "<rootDir>/e2e/setup.js"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hello-jelly/fsjs-e2e-route-model-quiz.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hello-jelly/fsjs-e2e-route-model-quiz/issues"
+  },
+  "homepage": "https://github.com/hello-jelly/fsjs-e2e-route-model-quiz#readme"
+}
