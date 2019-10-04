@@ -34,13 +34,14 @@ describe('bands API', () => {
   }
 
   it('post a band', () => {
-    return postBand(band, user).then(band => {
-      expect(band).toEqual({
-        _id: expect.any(String),
-        __v: 0,
-        ...band
+    return postBand(band, user)
+      .then(band => {
+        expect(band).toEqual({
+          _id: expect.any(String),
+          __v: 0,
+          ...band
+        });
       });
-    });
   });
 
   it('post a band for this user', () => {

@@ -77,7 +77,7 @@ describe.only('me API', () => {
       });
   });
 
-  it('removes a favorite animal for a user', () => {
+  it('delete a favorite band for a user', () => {
     return postBand(firstBand)
       .then(band => {
         return request
