@@ -39,23 +39,6 @@ describe('dogs API', () => {
       });
   });
 
-  it('post a dog for this user', () => {
-    return request
-      .post('/api/dog')
-      .set('Authorization', user.token)
-      .send(dog)
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.owner).toBe(user._id);
-        expect(body).toMatchInlineSnapshot(
-          {
-            _id: expect.any(String),
-            owner: expect.any(String)
-          },
-        );
-      });
-  });
-
   it('gets a list of dogs', () => {
     const firstDog = {
       breed: 'Jindo',
@@ -93,8 +76,8 @@ describe('dogs API', () => {
         dog.countryOfOrigin = 'Korea';
         return request
           .put(`/api/dogs/${dog._id}`)
-          .send(dog)
           .set('Authorization', user.token)
+          .send(dog)
           .expect(200);
       })
       .then(({ body }) => {
