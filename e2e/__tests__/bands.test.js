@@ -52,7 +52,6 @@ describe('bands api', () => {
             _id: expect.any(String),
             owner: expect.any(String)
           },
-
           `
           Object {
             "__v": 0,

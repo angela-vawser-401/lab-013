@@ -1,22 +1,28 @@
 const request = require('../request');
-const db = require('../db');
-const mongoose = require('mongoose');
-const { signupUser } = require('../data-helpers');
+const { dropCollection } = require('../db');
+const { signupUser, signinUser } = require('../data-helpers');
 
+describe('Bands API', () => {
+  beforeEach(() => dropCollection('users'));
+  beforeEach(() => dropCollection('bands'));
 
-
-describe.only('me API', () => {
-  beforeEach(() => db.dropCollection('users'));
+  const testUser = {
+    email: 'me@me.com',
+    password: 'abc'
+  };
 
   let user = null;
   beforeEach(() => {
-    return signupUser().then(newUser => (user = newUser));
+    return signupUser(testUser)
+      .then(() => {
+        return signinUser(testUser)
+          .then(body => user = body);
+      });
   });
 
-  const firstBand = {
+  const band = {
     name: 'SsingSsing',
     genre: 'glam rock',
-    owner: new mongoose.Types.ObjectId,
     yearFormed: 2010,
     members: 'Lee Hee-Moon, Shin Seung-Tae, Choo Da-Hye, Jang Young-Gyu, Lee Chul-Hee, Lee Tae-Won',
     albums: ['SsingSsing'],
@@ -25,6 +31,7 @@ describe.only('me API', () => {
   };
 
   function postBand(band) {
+    //band.owner = user._id; not needed because present in post of bands route
     return request
       .post('/api/bands')
       .set('Authorization', user.token)
@@ -33,7 +40,18 @@ describe.only('me API', () => {
       .then(({ body }) => body);
   }
 
-  it('getting no favorites returns empty array', () => {
+  function putBand(band) {
+    return postBand(band)
+      .then(band => {
+        return request 
+          .put(`/api/me/favorites/${band._id}`)
+          .set('Authorization', user.token)
+          .expect(200)
+          .then(() => band);
+      });
+  }
+
+  it('no favorites return empty array', () => { 
     return request
       .get('/api/me/favorites')
       .set('Authorization', user.token)
@@ -43,57 +61,50 @@ describe.only('me API', () => {
       });
   });
 
-  it('updates a favorite band for a user', () => {
-    return postBand(firstBand)
+  it('updates a band in favorites for user', () => {
+    return postBand(band)
       .then(band => {
         return request
           .put(`/api/me/favorites/${band._id}`)
           .set('Authorization', user.token)
-          .expect(200);
-      })
-      .then(({ body }) => {
-        expect(body[0].name).toBe(firstBand.name);
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.length).toBe(1);
+            expect(body[0]).toEqual(band._id);
+          });
       });
   });
 
-  it('gets a favorite band for a user', () => {
-    return postBand(firstBand)
-      .then(band => {
-        return request
-          .put(`/api/me/favorites/${band._id}`)
-          .set('Authorization', user.token)
-          .send(band)
-          .expect(200);
-      })
-      .then(() => {
+  it('gets a favorited band', () => {
+    return putBand(band)
+      .then((favoritedBand) => {
         return request
           .get('/api/me/favorites')
           .set('Authorization', user.token)
-          .expect(200);
-      })
-      .then(({ body }) => {
-        expect(body.length).toBe(1);
-        expect(body[0].name).toBe(firstBand.name);
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.length).toBe(1); 
+            expect(body[0]._id).toEqual(favoritedBand._id);
+          }); 
       });
   });
 
-  it('delete a favorite band for a user', () => {
-    return postBand(firstBand)
-      .then(band => {
+  it('deletes a favorited band', () => {
+    return putBand(band)
+      .then(favoritedBand => {
         return request
-          .put(`/api/me/favorites/${band._id}`)
+          .delete(`/api/me/favorites/${favoritedBand._id}`)
           .set('Authorization', user.token)
-          .send(band)
-          .expect(200);
-      })
-      .then(({ body }) => {
-        return request
-          .delete(`/api/me/favorites/${body[0]._id}`)
-          .set('Authorization', user.token)
-          .expect(200);
-      })
-      .then(({ body }) => {
-        expect(body.length).toBe(0);
+          .expect(200)
+          .then(() => {
+            return request
+              .get('/api/me/favorites')
+              .set('Authorization', user.token)
+              .expect(200)
+              .then(({ body }) => {
+                expect(body.length).toBe(0);
+              });
+          });
       });
   });
 });

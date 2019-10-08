@@ -92,7 +92,7 @@ describe('Auth API', () => {
   it('verifies a bad token', () => {
     return request
       .get('/api/auth/verify')
-      .set('Authorization', jwt.sign({ foo: 'bar' }, 'shhhhh'))
+      .set('Authorization', jwt.sign({ death: 'metal' }, 'rawrrrrrr!!!!'))
       .expect(401);
   });
 
